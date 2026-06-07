@@ -50,10 +50,7 @@ class SunoClient:
                 "cursor": cursor,
                 "limit": 20,
                 "filters": {
-                    "disliked": "False",
                     "trashed": "False",
-                    "fromStudioProject": {"presence": "False"},
-                    "stem": {"presence": "False"},
                     "user": {"presence": "True"}
                 }
             }

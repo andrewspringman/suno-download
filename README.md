@@ -111,7 +111,9 @@ python -m suno_download ~/Music/my-suno-songs
 
 The tool will:
 
-1. **Fetch** all songs from your Suno library via API (both public and private)
+1. **Fetch** all non-trashed songs from your Suno library via API (both public and private)
+   - Includes: liked, disliked, neutral songs, remasters, stems, all song types
+   - Excludes: only trashed songs
 2. **Save** complete library snapshot to `suno_library.json` with metadata for ALL songs (lyrics, prompts, tags, etc.)
 3. **Filter** to songs you've made public
 4. **Download MP3 files** only for public songs as `{title}_{id}.mp3`
