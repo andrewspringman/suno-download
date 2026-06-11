@@ -51,53 +51,6 @@ def sanitize_filename(filename: str) -> str:
     return sanitized
 
 
-def generate_tagger_json(songs: List[Dict], output_dir: Path,
-                         album: str = "", artist: str = "",
-                         genre: str = "", year: str = "",
-                         artwork: str = "") -> Path:
-    """Generate a bulk-id3-tagger JSON template from a list of Suno song dicts.
-
-    Args:
-        songs: List of song dicts from Suno API
-        output_dir: Directory where MP3s were downloaded (and JSON will be written)
-        album, artist, genre, year, artwork: Tagger defaults (edit before tagging)
-
-    Returns:
-        Path to the written JSON file
-    """
-    tracks = []
-    for i, song in enumerate(songs, start=1):
-        song_id = song.get('id', '')
-        title = song.get('title', 'Untitled')
-        safe_title = sanitize_filename(title)
-        filename = f"{safe_title}_{song_id}.mp3"
-        tracks.append({
-            "file": filename,
-            "title": title,
-            "track_number": i,
-        })
-
-    template = {
-        "defaults": {
-            "artist": artist,
-            "album": album,
-            "genre": genre,
-            "year": year,
-            "artwork": artwork,
-        },
-        "tracks": tracks,
-    }
-
-    output_path = output_dir / "tags.json"
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(template, f, indent=2, ensure_ascii=False)
-
-    print(f"\nTagger JSON written: {output_path}")
-    print(f"  Edit defaults (artist, album, genre, year, artwork) before running:")
-    print(f"  bulk-id3-tagger tag {output_dir} {output_path}")
-    return output_path
-
-
 def download_song(song: Dict, output_dir: Path, current: int, total: int) -> bool:
     """Download a single song MP3 file.
 

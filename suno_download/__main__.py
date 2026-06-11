@@ -4,9 +4,11 @@ import re
 import sys
 from pathlib import Path
 
+from bulk_id3_tagger.scanner import write_template
+
 from .auth import load_auth, AuthError
 from .api import SunoClient, SunoAPIError
-from .downloader import save_library_snapshot, download_song, generate_tagger_json
+from .downloader import save_library_snapshot, download_song
 
 
 def _extract_playlist_id(id_or_url: str) -> str:
@@ -79,9 +81,11 @@ def cmd_playlist(args):
         else:
             skipped += 1
 
-    # Generate tagger JSON
-    generate_tagger_json(
-        songs, output_dir,
+    # Generate tagger JSON using bulk-id3-tagger's canonical format
+    tags_path = output_dir / "tags.json"
+    write_template(
+        str(output_dir),
+        str(tags_path),
         album=parsed.album or playlist_name,
         artist=parsed.artist,
         genre=parsed.genre,

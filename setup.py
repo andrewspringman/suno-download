@@ -18,6 +18,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "requests>=2.31.0",
+        "bulk-id3-tagger>=0.1.0",
     ],
     python_requires=">=3.7",
     entry_points={
