@@ -93,7 +93,38 @@ export SUNO_DEVICE_ID="your-device-id-here"
 
 ## Usage
 
-### Basic usage (with prompt for directory)
+### Download a specific playlist (recommended for album releases)
+
+Point the tool at any Suno playlist URL and it downloads all songs in that playlist, then writes a ready-to-edit `tags.json` for [bulk-id3-tagger](https://github.com/andrewspringman/bulk-id3-tagger):
+
+```bash
+# Using the full playlist URL
+python -m suno_download playlist https://suno.com/playlist/your-playlist-id
+
+# With album metadata pre-filled (saves editing the JSON)
+python -m suno_download playlist https://suno.com/playlist/your-playlist-id \
+  --album "French Gypsy Jazz" \
+  --artist "Andrew Springman" \
+  --genre "Gypsy Jazz" \
+  --year "2024" \
+  --artwork "/path/to/cover.jpg"
+```
+
+Output:
+```
+~/Music/French_Gypsy_Jazz/
+├── Song Title_abc123.mp3
+├── Another Song_def456.mp3
+├── ...
+└── tags.json   ← ready for bulk-id3-tagger
+```
+
+Then tag everything in one command:
+```bash
+bulk-id3-tagger tag ~/Music/French_Gypsy_Jazz ~/Music/French_Gypsy_Jazz/tags.json
+```
+
+### Full library download
 
 ```bash
 python -m suno_download

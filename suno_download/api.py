@@ -27,6 +27,60 @@ class SunoClient:
         self.headers['Accept'] = 'application/json'
         self.headers['Content-Type'] = 'application/json'
 
+    def fetch_playlist(self, playlist_id: str) -> Dict:
+        """Fetch songs in a specific playlist.
+
+        Args:
+            playlist_id: Suno playlist ID (from URL)
+
+        Returns:
+            Dict with 'name' (playlist title) and 'clips' (list of song dicts)
+
+        Raises:
+            SunoAPIError: If API request fails
+        """
+        url = f"{self.BASE_URL}/api/playlist/v2/{playlist_id}"
+
+        try:
+            response = requests.get(url, headers=self.headers, timeout=30)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 401:
+                raise SunoAPIError(
+                    "Authentication failed (401). Your credentials may have expired.\n"
+                    "Please re-extract headers from browser DevTools."
+                )
+            elif response.status_code == 404:
+                raise SunoAPIError(
+                    f"Playlist '{playlist_id}' not found (404).\n"
+                    "Check the playlist ID — it should be the UUID from the Suno URL.\n"
+                    "Example: suno.com/playlist/abc123 → playlist_id is 'abc123'"
+                )
+            raise SunoAPIError(f"HTTP error fetching playlist: {e}")
+        except requests.exceptions.RequestException as e:
+            raise SunoAPIError(f"Network error fetching playlist: {e}")
+
+        try:
+            data = response.json()
+        except ValueError as e:
+            raise SunoAPIError(f"Invalid JSON response from playlist API: {e}")
+
+        playlist = data.get('playlist', data)
+        clips = playlist.get('playlist_clips', playlist.get('clips', []))
+        # playlist_clips wraps each song under a 'clip' key
+        songs = [c.get('clip', c) for c in clips]
+        name = playlist.get('name', playlist.get('title', 'Playlist'))
+
+        if not songs:
+            raise SunoAPIError(
+                f"No songs found in playlist '{playlist_id}'.\n"
+                "The playlist may be empty or private.\n"
+                "Make sure the playlist is public and the ID is correct."
+            )
+
+        print(f"Playlist: {name} ({len(songs)} songs)")
+        return {'name': name, 'clips': songs}
+
     def fetch_all_songs(self) -> List[Dict]:
         """Fetch all songs from user's library via paginated API calls.
 
